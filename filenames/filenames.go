@@ -2,7 +2,6 @@ package filenames
 
 import (
 	"github.com/kabukky/journey/flags"
-	"github.com/kardianos/osext"
 	"log"
 	"os"
 	"path/filepath"
@@ -89,9 +88,13 @@ func determineAssetPath() string {
 
 func determineExecutablePath() string {
 	// Get the path this executable is located in
-	executablePath, err := osext.ExecutableFolder()
+	// As of Go 1.8, osext.Executable is implemented in os.
+	// For some reason, this works in Android, but osext doesn't
+	p, err := os.Executable()
 	if err != nil {
 		log.Fatal("Error: Couldn't determine what directory this executable is in:", err)
 	}
+	p = filepath.Clean(p)
+	executablePath := filepath.Dir(p)
 	return executablePath
 }
